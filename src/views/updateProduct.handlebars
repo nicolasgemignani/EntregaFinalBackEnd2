@@ -1,0 +1,50 @@
+<div class="container mt-5">
+    <h1 class="text-center">Actualizar Producto</h1>
+    <form action="/products/{{product._id}}/update" method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="title" class="form-label">Título del Producto:</label>
+            <input type="text" class="form-control" id="title" name="title" value="{{product.title}}" required />
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Descripción:</label>
+            <textarea class="form-control" id="description" name="description" required>{{product.description}}</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="code" class="form-label">Código del Producto:</label>
+            <input type="text" class="form-control" id="code" name="code" value="{{product.code}}" required />
+        </div>
+
+        <div class="mb-3">
+            <label for="price" class="form-label">Precio:</label>
+            <input type="number" class="form-control" id="price" name="price" min="0" step="0.01" value="{{product.price}}" required />
+        </div>
+
+        <div class="mb-3">
+            <label for="status" class="form-label">¿Está disponible?</label>
+            <select class="form-select" id="status" name="status" required>
+                <option value="true" {{#if product.status}}selected{{/if}}>Sí</option>
+                <option value="false" {{#unless product.status}}selected{{/unless}}>No</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="stock" class="form-label">Cantidad en Stock:</label>
+            <input type="number" class="form-control" id="stock" name="stock" min="0" value="{{product.stock}}" required />
+        </div>
+
+        <div class="mb-3">
+            <label for="category" class="form-label">Categoría:</label>
+            <input type="text" class="form-control" id="category" name="category" value="{{product.category}}" required />
+        </div>
+
+        <div class="mb-3">
+            <label for="thumbnail" class="form-label">Imagen del Producto:</label>
+            <input type="file" class="form-control" id="thumbnail" name="thumbnail" accept="image/*" />
+            <small>Si deseas cambiar la imagen, selecciona una nueva.</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Actualizar Producto</button>
+    </form>
+</div>

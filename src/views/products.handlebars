@@ -1,0 +1,51 @@
+
+<div class="container mt-5">
+    <h1 class="text-center">Lista de Productos</h1>
+
+    {{#if user}} <!-- Verifica si hay un usuario autenticado -->
+        <p>Bienvenid@, {{user.first_name}}!</p> <!-- Puedes mostrar cualquier información del usuario -->
+        <p>Tu rol es: <strong>{{user.role}}</strong></p>
+        <form action="/api/sessions/logout" method="post">
+            <button type="submit" class="btn btn-danger mb-2">Cerrar Sesión</button>
+        </form>
+        <a href="/add-products" class="btn btn-danger mb-2">Agregar un producto</a>
+        <a href="/carrito/{{this.user.cart}}" class="btn btn-danger mb-2">Ver Carrito</a>
+        {{!-- <a class="btn btn-primary" href="/products?page={{prevPage}}">Anterior</a> --}}
+    {{else}}
+        <p>No has iniciado sesión.</p>
+    {{/if}}
+
+    <ul class="list-group">
+        {{#each products}}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Título:</strong> {{this.title}} <br>
+                <strong>Precio:</strong> ${{this.price}} <br>
+                <strong>Categoría:</strong> {{this.category}} <br>
+            </div>
+            <form action="/cart/add/{{this._id}}" method="POST" class="d-inline">
+                <input type="hidden" name="quantity" value="1"> <!-- Ajusta la cantidad según tus necesidades -->
+                <button type="submit" class="btn btn-success">Agregar al carrito</button>
+            </form>
+            <a href="/edit-product/{{this._id}}" class="btn btn-warning">Actualizar</a>
+            <form action="/products/{{this._id}}/delete" method="POST" class="d-inline" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este producto?');">
+                <button type="submit" class="btn btn-danger">Eliminar</button>
+            </form>
+        </li>
+        {{/each}}
+    </ul>
+
+    <div class="pagination justify-content-center mt-3">
+        {{#if hasPrevPage}}
+        <a class="btn btn-primary" href="/products?page={{prevPage}}">Anterior</a>
+        {{/if}}
+
+        <span class="mx-2">Página {{currentPage}} de {{totalPages}}</span>
+
+        {{#if hasNextPage}}
+        <a class="btn btn-primary" href="/products?page={{nextPage}}">Siguiente</a>
+        {{/if}}
+    </div>
+</div>
+
+<script src="/js/products.js"></script>

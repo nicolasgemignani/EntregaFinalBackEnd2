@@ -1,0 +1,58 @@
+<!-- addProduct.ejs o el motor de plantillas que estés usando -->
+<form action="/addProducts" method="POST" enctype="multipart/form-data" class="container mt-5">
+    <h2>Agregar Nuevo Producto</h2>
+
+    <!-- Título del Producto -->
+    <div class="mb-3">
+        <label for="title" class="form-label">Título del Producto:</label>
+        <input type="text" id="title" name="title" class="form-control" required />
+    </div>
+
+    <!-- Descripción -->
+    <div class="mb-3">
+        <label for="description" class="form-label">Descripción:</label>
+        <textarea id="description" name="description" class="form-control" required></textarea>
+    </div>
+
+    <!-- Código del Producto -->
+    <div class="mb-3">
+        <label for="code" class="form-label">Código del Producto:</label>
+        <input type="text" id="code" name="code" class="form-control" required />
+    </div>
+
+   <!-- Precio -->
+    <div class="mb-3">
+        <label for="price" class="form-label">Precio:</label>
+        <input type="number" id="price" name="price" class="form-control" min="0" step="0.01" required />
+    </div>
+
+    <!-- Estado (Disponible o no) -->
+    <div class="mb-3">
+        <label for="status" class="form-label">¿Está disponible?</label>
+        <select id="status" name="status" class="form-select" required>
+            <option value="true">Sí</option>
+            <option value="false">No</option>
+        </select>
+    </div>
+
+    <!-- Stock -->
+    <div class="mb-3">
+        <label for="stock" class="form-label">Cantidad en Stock:</label>
+        <input type="number" id="stock" name="stock" class="form-control" min="0" required />
+    </div>
+
+    <!-- Categoría -->
+    <div class="mb-3">
+        <label for="category" class="form-label">Categoría:</label>
+        <input type="text" id="category" name="category" class="form-control" required />
+    </div>
+
+    <!-- Imagen del Producto -->
+    <div class="mb-3">
+        <label for="thumbnail" class="form-label">Imagen del Producto:</label>
+        <input type="file" id="thumbnail" name="thumbnail" class="form-control" accept="image/*" required/>
+    </div>
+
+    <!-- Botón de Enviar -->
+    <button type="submit" class="btn btn-primary">Agregar Producto</button>
+</form>

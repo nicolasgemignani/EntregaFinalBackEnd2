@@ -1,0 +1,25 @@
+<main>
+    <div class="container">
+        <h1>Login</h1>
+        <form action="/api/sessions/login" method="post" class="form-group w-50">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" name="email" id="email" class="form-control" placeholder="Ingrese su email" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" name="password" id="password" class="form-control" placeholder="Ingrese su contraseña" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Iniciar Sesión</button>
+            <div class="mt-3">
+                <a href="/register" class="text-decoration-none">¿No tienes una cuenta? Regístrate aquí</a>
+            </div>
+        </form>
+        <a href="/api/sessions/github" class="btn btn-outline-dark w-75 mt-3">Entrar con Github</a>
+        
+        <!-- Mensaje de error -->
+        <div class="alert alert-danger mt-3" style="display: none;" id="error-message">
+            <!-- El mensaje de error se puede agregar aquí desde el servidor -->
+        </div>
+    </div>
+</main>
