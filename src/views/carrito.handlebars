@@ -1,28 +1,43 @@
 <h1>Carrito de Compras</h1>
 
-    {{#if cart.length}}
-        <table>
-            <thead>
+{{#if cart.length}}
+    <table>
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each cart}}
                 <tr>
-                    <th>Producto</th>
-                    <th>Cantidad</th>
-                    <th>Precio Unitario</th>
-                    <th>Total</th>
+                    <td>{{this.product.title}}</td>
+                    <td>{{this.quantity}}</td>
+                    <td>${{this.product.price}}</td>
+                    <td>${{this.totalPrice}}</td>
                 </tr>
-            </thead>
-            <tbody>
-                {{#each cart}}
-                    <tr>
-                        <td>{{this.product.name}}</td>
-                        <td>{{this.quantity}}</td>
-                        <td>${{this.product.price}}</td>
-                        <td>${{this.totalPrice}}</td>
-                    </tr>
-                {{/each}}
-            </tbody>
-        </table>
+            {{/each}}
+        </tbody>
+    </table>
 
-        <p><strong>Total del carrito:</strong> ${{totalPrice}}</p>
-    {{else}}
-        <p>Tu carrito está vacío.</p>
-    {{/if}}
+    <p><strong>Total del carrito:</strong> ${{totalPrice}}</p>
+    <!-- Botón para comprar y generar el ticket -->
+    <form action="/ticket/generar" method="POST">
+        <button type="submit">Comprar</button>
+    </form>
+
+    <form action="/carrito/vaciar/{{cartId}}" method="POST" style="display:inline;">
+        <button type="submit" style="background-color: red; color: white;">Vaciar Carrito</button>
+    </form>
+
+    <button onclick="window.location.href='/products';" style="margin-top: 15px;">
+        Volver a Productos
+    </button>
+{{else}}
+    <p>Tu carrito está vacío.</p>
+    <button onclick="window.location.href='/products';" style="margin-top: 15px;">
+        Volver a Productos
+    </button>
+{{/if}}

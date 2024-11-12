@@ -32,7 +32,6 @@ export const verifyToken = (req, res, next) => {
             req.user = null // Si hay un error en la verificación, no hay usuario
             return next() // Pasamos al siguiente middleware
         }
-
         req.user = decoded // Agrega el usuario decodificado a req.user
         next()
     })

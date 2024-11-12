@@ -50,7 +50,8 @@ class SessionController {
                 id: userFound._id, 
                 role: userFound.role, 
                 first_name: userFound.first_name, 
-                cart: cartId 
+                cart: cartId,
+                email: userFound.email
             })
     
             res.cookie('token', token, {

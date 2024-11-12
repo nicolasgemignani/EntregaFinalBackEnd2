@@ -1,0 +1,33 @@
+<body>
+    <h1>Ticket de Compra</h1>
+    <p><strong>Código del Ticket:</strong> {{ticket.code}}</p>
+    <p><strong>Comprador:</strong> {{ticket.purchaser}}</p>
+    <p><strong>Total:</strong> ${{ticket.amount}}</p>
+
+    <h2>Productos Comprados:</h2>
+    <ul>
+        {{#each ticket.products}}
+            <li>
+                <strong>Producto:</strong> {{this.nombre}} - 
+                <strong>Cantidad:</strong> {{this.cantidad}} - 
+                <strong>Precio unitario:</strong> ${{this.precio}}
+            </li>
+        {{/each}}
+    </ul>
+
+    {{#if productosNoComprados.length}}
+        <h2>Productos No Comprados (stock insuficiente):</h2>
+        <ul>
+            {{#each productosNoComprados}}
+                <li>
+                    <strong>Producto:</strong> {{this.nombre}} - 
+                    <strong>Cantidad Faltante:</strong> {{this.cantidadFaltante}}
+                </li>
+            {{/each}}
+        </ul>
+    {{/if}}
+
+    <button onclick="window.location.href='/products';" style="margin-top: 15px;">
+        Volver a Productos
+    </button>
+</body>

@@ -1,5 +1,6 @@
 import { productService } from "../service/index.service.js";
 import { cartService } from "../service/index.service.js";
+import { ticketService } from "../service/index.service.js";
 import mongoose from "mongoose";
 
 
@@ -7,6 +8,7 @@ class ViewController {
     constructor(){
         this.productService = productService
         this.cartService = cartService
+        this.ticketService = ticketService
     }
 
     registro = (req, res) => {
@@ -161,36 +163,161 @@ class ViewController {
         if (!req.user) {
             return res.status(401).json({ error: 'User not authenticated' });
         }
-    
         try {
-            // Obtén el carrito real desde la base de datos
             const cart = await cartService.getCart(req.params.id);
             
-            // Si no se encuentra el carrito, devuelve un error
             if (!cart) {
                 return res.status(404).json({ error: 'Carrito no encontrado' });
             }
     
-            // Verificar que cart.products existe y es un array antes de llamar a map
-            const cartItems = Array.isArray(cart.products) ? cart.products.map(item => {
-                // Llamar al servicio para obtener el producto real usando el ID de 'item.product'
-                // Este paso depende de cómo estés obteniendo el producto, por ejemplo:
-                const totalPrice = item.quantity * 100;  // Si tienes un precio estático, de lo contrario obtén el precio del producto
+            // Mapea los productos y ajusta la estructura
+            const cartItems = Array.isArray(cart.products) ? await Promise.all(cart.products.map(async (item) => {
+                const product = await productService.getProduct(item.product);
+                
+                if (!product) {
+                    return null;
+                }
+    
+                const totalPrice = item.quantity * product.price;
+    
                 return {
-                    ...item,
+                    quantity: item._doc.quantity,  // Asegura que quantity esté en el nivel superior
+                    product,  // Incluye los datos del producto completo
                     totalPrice
                 };
-            }) : [];
+            })) : [];
     
-            // Pasar el carrito y los productos con su total a la plantilla
-            res.render('carrito', { cart: cartItems });
+            const filteredCartItems = cartItems.filter(item => item !== null);
+
+            // Calcular el total del carrito sumando el totalPrice de cada item
+            const cartTotalPrice = parseFloat(filteredCartItems.reduce((acc, item) => acc + item.totalPrice, 0).toFixed(2));
+    
+            res.render('carrito', { cart: filteredCartItems, totalPrice: cartTotalPrice, cartId: cart._id });
         } catch (error) {
             res.status(500).json({ status: 'error', message: 'Error al obtener el carrito', error: error.message });
         }
     };
     
+
+    createTicket = async (req, res) => {
+        try {
+            const userId = req.user.cart;
+            const cart = await this.cartService.getCart(userId);
+    
+            if (!cart || cart.products.length === 0) {
+                return res.status(400).json({ error: 'El carrito está vacío o no existe' });
+            }
+    
+            const productosNoComprados = [];
+            const productosComprados = [];
+    
+            // Procesar cada producto en el carrito
+            for (let item of cart.products) {
+                const producto = item.product;
+                const cantidadSolicitada = item.quantity;
+    
+                // Verificar si hay suficiente stock o ajustar a la cantidad disponible
+                if (producto.stock >= cantidadSolicitada) {
+                    producto.stock -= cantidadSolicitada;
+                    await producto.save();
+                    productosComprados.push({
+                        nombre: producto.title,
+                        producto: producto._id,
+                        cantidad: cantidadSolicitada,
+                        precio: producto.price
+                    });
+                } else if (producto.stock > 0) {
+                    // Comprar la cantidad que haya en stock si no alcanza para el total solicitado
+                    productosComprados.push({
+                        nombre: producto.title,
+                        producto: producto._id,
+                        cantidad: producto.stock,
+                        precio: producto.price
+                    });
+                    productosNoComprados.push({
+                        nombre: producto.title,
+                        producto: producto._id,
+                        cantidadFaltante: cantidadSolicitada - producto.stock
+                    });
+                    // Actualizar la cantidad restante en el carrito
+                    item.quantity = cantidadSolicitada - producto.stock;
+                    producto.stock = 0;
+                    await producto.save();
+                } else {
+                    // Si no hay stock disponible en absoluto
+                    productosNoComprados.push({
+                        nombre: producto.title,
+                        producto: producto._id,
+                        cantidadFaltante: cantidadSolicitada
+                    });
+                }
+            }
+    
+            // Calcular el monto total solo de los productos comprados
+            const totalAmount = productosComprados.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
+    
+            let newTicket = null;
+            if (productosComprados.length > 0) {
+                const ticketData = {
+                    amount: totalAmount,
+                    purchaser: req.user.email,
+                    products: productosComprados
+                };
+    
+                // Crear el ticket para los productos comprados
+                newTicket = await this.ticketService.createTicket(ticketData);
+                if (!newTicket) {
+                    return res.status(500).json({ error: 'No se pudo crear el ticket, intente nuevamente' });
+                }
+            }
+    
+            // Actualizar el carrito para que solo contenga productos no comprados o incompletos
+            cart.products = cart.products.filter(item => productosNoComprados.some(p => p.producto.equals(item.product._id)));
+            await cart.save();
+    
+            // Responder con el ticket y la lista de productos que no pudieron comprarse en su totalidad
+            if (newTicket) {
+                res.status(201).render('ticket', {
+                    message: 'Compra procesada',
+                    ticket: {
+                        code: newTicket.code,
+                        amount: newTicket.amount,
+                        purchaser: newTicket.purchaser,
+                        products: productosComprados
+                    },
+                    productosNoComprados
+                });
+            } else {
+                res.status(400).json({ error: 'No se pudieron comprar productos debido a falta de stock' });
+            }
+    
+        } catch (error) {
+            console.error('Error al crear el ticket:', error);
+            res.status(500).json({ error: 'Error al crear el ticket. Intente nuevamente más tarde.' });
+        }
+    };
     
     
+    
+    emptyCart = async (req, res) => {
+        try {
+            const cartId = req.params.id;
+            
+            // Vaciar el carrito utilizando el servicio
+            await this.cartService.emptyCart(cartId);
+
+            // Redirigir a la vista del carrito con el id correspondiente
+            res.redirect(`/carrito/${cartId}`);
+        } catch (error) {
+            console.error('Error al vaciar el carrito:', error);
+            res.status(500).json({ error: 'No se pudo vaciar el carrito, intente nuevamente' });
+        }
+    };
+    
+    
+    ticketSucess = (req, res) => {
+        res.render('ticket_success', { message: '¡Compra realizada con éxito! Gracias por su compra.' });
+    }
 }
 
 export default ViewController

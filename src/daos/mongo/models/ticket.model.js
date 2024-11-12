@@ -21,8 +21,8 @@ const ticketSchema = new mongoose.Schema({
         required: true // Total de la compra
     },
     purchaser: {
-        type: String,
-        required: true // Correo electrónico del usuario asociado al carrito
+        type: String, // Cambiado de ObjectId a String para almacenar el email
+        required: true
     }
 });
 

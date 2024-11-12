@@ -33,4 +33,8 @@ router.post('/products/:id/delete', verifyToken, passportCall('jwt', { session: 
 
 router.get('/carrito/:id',verifyToken, viewController.getCart)
 
+router.post('/ticket/generar',verifyToken, viewController.createTicket)
+
+router.post('/carrito/vaciar/:id', viewController.emptyCart)
+
 export default router

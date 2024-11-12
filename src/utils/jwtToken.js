@@ -3,10 +3,17 @@ import { variables } from '../config/var.entorno.js'
 
 export const generateToken = user => {
     try {
-        const { id, role, first_name, cart } = user;
-        return jwt.sign({ id, role, first_name, cart }, variables.PRIVATE_KEY, { expiresIn: '1d' });
+        // Desestructuración del objeto user
+        const {  id, first_name, email, role, cart } = user;
+
+        // Incluir todos los campos relevantes en el payload del token
+        return jwt.sign(
+            {  id , first_name, email, role, cart },  // Aquí incluyes el email
+            variables.PRIVATE_KEY,
+            { expiresIn: '1d' }
+        );
     } catch (error) {
         console.error("Error generando el token:", error);
-        throw new Error("Error generando el token"); // Lanza un error para manejarlo donde se llame a esta función
+        throw new Error("Error generando el token");
     }
 };

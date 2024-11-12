@@ -17,7 +17,8 @@ URL: http://localhost:8080/api/products
 
 
 URL: http://localhost:8080/login
-emails: nicolasgemignani@outlook.com y sofia@outlook.com
+email ADMIN: nicolasgemignani@outlook.com
+email USER: sofiaG@outlook.com
 passwords: 123456
 
 
