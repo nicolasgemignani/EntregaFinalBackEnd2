@@ -17,7 +17,6 @@ class CartRepository {
         return await this.dao.addToCart(cartId, productId, quantityToAdd);
     };
 
-
     // Método para actualizar los productos de un carrito
     updateCart = async (cartId, newProducts) => 
         await this.dao.updateCart(cartId, newProducts);

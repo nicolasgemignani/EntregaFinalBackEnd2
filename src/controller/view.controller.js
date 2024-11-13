@@ -1,6 +1,7 @@
 import { productService } from "../service/index.service.js";
 import { cartService } from "../service/index.service.js";
 import { ticketService } from "../service/index.service.js";
+import { sendEmail } from "../utils/sendEmail.js";
 import mongoose from "mongoose";
 
 
@@ -277,6 +278,7 @@ class ViewController {
     
             // Responder con el ticket y la lista de productos que no pudieron comprarse en su totalidad
             if (newTicket) {
+                await sendEmail(req.user.email, newTicket, productosNoComprados, productosComprados);
                 res.status(201).render('ticket', {
                     message: 'Compra procesada',
                     ticket: {

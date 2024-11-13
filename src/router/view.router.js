@@ -4,6 +4,7 @@ import ViewController from '../controller/view.controller.js'
 import { passportCall, verifyToken } from '../midllewares/passportMiddle.js'
 import { authorization } from '../midllewares/authorization.js'
 import uploader from '../utils/multer.js'
+import { sendEmail } from '../utils/sendEmail.js'
 
 const router = Router()
 const viewController = new ViewController()
